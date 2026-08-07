@@ -1,0 +1,4 @@
+baseURL = "https://go-regexp.github.io/"
+languageCode = "en-us"
+title = "go-regexp"
+disableKinds = ["taxonomy", "term", "RSS", "sitemap"]

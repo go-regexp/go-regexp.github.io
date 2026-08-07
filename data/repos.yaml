@@ -1,0 +1,2 @@
+items:
+  - { name: "engine", kind: "core", desc: "Pure-Go Onigmo-lineage regex engine; stdlib-<code>regexp</code>-shaped API with lookaround &amp; backrefs. CGO=0." }

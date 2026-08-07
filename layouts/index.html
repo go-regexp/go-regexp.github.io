@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ .Site.Title }} — pure-Go regex with lookaround</title>
+<meta name="description" content="A pure-Go (CGO=0) regular-expression engine of the Onigmo lineage, with a public API shaped like the standard library&#x27;s regexp package — plus lookahead, lookbehind, backreferences, atomic groups and subexpression calls that RE2 rejects at compile time. Identical on macOS, Linux and Windows.">
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1b1f24; --muted: #57606a; --card: #f6f8fa;
+    --border: #d0d7de; --accent: #B91C1C; --accent-fg: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --card: #161b22;
+      --border: #30363d; --accent: #EF4444; --accent-fg: #0d1117;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --card: #161b22;
+    --border: #30363d; --accent: #EF4444; --accent-fg: #0d1117;
+  }
+  .theme-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 10;
+    font: inherit; font-size: .8rem; cursor: pointer; padding: 6px 12px;
+    color: var(--fg); background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
+  header { padding: 72px 0 32px; text-align: center; }
+  .logo { width: 88px; height: 88px; margin: 0 auto 18px; display: block; }
+  h1 { font-size: 2.6rem; margin: 0 0 .3em; letter-spacing: -.02em; }
+  .tagline { font-size: 1.2rem; color: var(--muted); margin: 0 auto; max-width: 700px; }
+  .pills { margin: 22px 0 0; }
+  .pill {
+    display: inline-block; margin: 4px; padding: 3px 10px; font-size: .82rem;
+    color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+  }
+  .cta { margin: 30px 0 0; }
+  .btn {
+    display: inline-block; padding: 10px 18px; margin: 4px; border-radius: 8px; text-decoration: none;
+    font-weight: 600; border: 1px solid var(--border);
+  }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .btn.ghost { color: var(--fg); background: transparent; }
+  .lead { color: var(--fg); max-width: 820px; margin: 8px auto 0; text-align: center; }
+  .lead code { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; }
+  .contract { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 4px 20px 18px; margin: 28px auto 0; max-width: 820px; }
+  .contract h2 { font-size: 1.25rem; margin: 18px 0 .2em; }
+  .contract p { color: var(--muted); margin: 0 0 .6em; }
+  .contract pre { overflow-x: auto; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin: 0; }
+  .contract code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86rem; }
+  .note { background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 12px 18px; margin: 24px auto 0; max-width: 820px; color: var(--muted); }
+  h2.section { text-align: center; margin: 44px 0 4px; font-size: 1.4rem; }
+  .sub { text-align: center; color: var(--muted); margin: 0 auto; max-width: 720px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; padding: 16px 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; }
+  .card h3 { margin: 0 0 .35em; font-size: 1.2rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .card h3 a { text-decoration: none; }
+  .card p { margin: 0 0 .8em; color: var(--fg); font-size: .95rem; }
+  .card .badges { margin-top: auto; }
+  .card .badges img { height: 20px; vertical-align: middle; }
+  .kind { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); white-space: nowrap; color: var(--accent); }
+  .principles { color: var(--muted); text-align: center; padding: 10px 0 0; max-width: 840px; margin: 0 auto; }
+  footer { color: var(--muted); text-align: center; padding: 40px 0 56px; font-size: .9rem; }
+  a { color: var(--accent); }
+</style>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<script>
+  (function(){var m=localStorage.getItem('theme');if(m&&m!=='system')document.documentElement.setAttribute('data-theme',m);})();
+</script>
+</head>
+<body>
+  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light, dark or system theme"><span id="theme-label">🖥️ System</span></button>
+  <header class="wrap">
+    <img class="logo" src="/img/logo.svg" alt="go-regexp logo" width="88" height="88">
+    <h1>go-regexp</h1>
+    <p class="tagline">Pure-Go regular expressions with <strong>lookahead</strong>, <strong>lookbehind</strong> and <strong>backreferences</strong> — the constructs RE2 forbids.</p>
+    <div class="pills"><span class="pill">CGO_ENABLED=0</span><span class="pill">lookahead / lookbehind</span><span class="pill">backreferences</span><span class="pill">atomic groups · \g&lt;call&gt;</span><span class="pill">stdlib-regexp-shaped API</span><span class="pill">macOS · Linux · Windows</span><span class="pill">BSD-3-Clause</span></div>
+    <div class="cta">
+      <a class="btn primary" href="https://go-regexp.github.io/docs/">Documentation</a>
+      <a class="btn ghost" href="https://github.com/go-regexp">GitHub</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="lead">The standard library <code>regexp</code> is built on RE2, which guarantees linear-time matching by <strong>forbidding</strong> the features that need backtracking. <code>go-regexp</code> supports exactly those — lookahead <code>(?=…)</code>/<code>(?!…)</code>, lookbehind <code>(?&lt;=…)</code>/<code>(?&lt;!…)</code>, backreferences <code>\1</code>/<code>\k&lt;name&gt;</code>, atomic groups and <code>\g&lt;name&gt;</code> subexpression calls — while keeping a standard-library-shaped API, so it drops in next to <code>regexp</code> without an alias.</p>
+
+    <div class="contract">
+      <h2>Quickstart</h2>
+      <p>Match a version only when it is followed by a quote or angle bracket — a lookahead RE2 rejects:</p>
+      <pre><code>re := onigmo.MustCompile(`v\d+\.\d+\.\d+(?=[&quot;&lt;])`)
+got := re.FindAllString(`a v1.2.3&quot; b v4.5.6&lt; c v9.9.9 d`, -1)
+// got == []string{&quot;v1.2.3&quot;, &quot;v4.5.6&quot;}   (v9.9.9 excluded)</code></pre>
+    </div>
+
+    <h2 class="section">Repositories</h2>
+    <p class="sub">The single module in the org today, mirrored from the live GitHub repo.</p>
+    <section class="grid">
+      {{ range site.Data.repos.items }}
+      <article class="card">
+        <h3>
+          <a href="https://github.com/go-regexp/{{ .name }}"><code>{{ .name }}</code></a>
+          <span class="kind">{{ .kind }}</span>
+        </h3>
+        <p>{{ .desc | safeHTML }}</p>
+        <div class="badges">
+          <a href="https://github.com/go-regexp/{{ .name }}/actions/workflows/ci.yml"><img src="https://github.com/go-regexp/{{ .name }}/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+          <a href="https://pkg.go.dev/github.com/go-regexp/{{ .name }}"><img src="https://pkg.go.dev/badge/github.com/go-regexp/{{ .name }}.svg" alt="Go Reference"></a>
+        </div>
+      </article>
+      {{ end }}
+    </section>
+    <p class="principles">Pure Go with <code>CGO_ENABLED=0</code> — no C library, no cgo, identical on every platform. A backtracking VM serves the full feature set, with a linear-time lazy-NFA/DFA accelerator for the RE2-compatible subset and a step/time budget that bounds pathological patterns. 100% statement coverage, 6-arch + qemu + wasm CI. BSD-3-Clause.</p>
+  </main>
+
+  <footer class="wrap">
+    BSD-3-Clause · <a href="https://github.com/go-regexp">github.com/go-regexp</a> ·
+    Branding from <a href="https://github.com/go-regexp/brand">go-regexp/brand</a>
+  </footer>
+  <script>
+  (function(){
+    var order=['system','light','dark'], root=document.documentElement;
+    var labels={system:'🖥️ System',light:'☀️ Light',dark:'🌙 Dark'};
+    function apply(m){ if(m==='system'){root.removeAttribute('data-theme');}else{root.setAttribute('data-theme',m);} localStorage.setItem('theme',m); var el=document.getElementById('theme-label'); if(el)el.textContent=labels[m]; }
+    var mode=localStorage.getItem('theme')||'system'; apply(mode);
+    var btn=document.getElementById('theme-toggle');
+    if(btn) btn.addEventListener('click',function(){ mode=order[(order.indexOf(mode)+1)%order.length]; apply(mode); });
+  })();
+  </script>
+</body>
+</html>
