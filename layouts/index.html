@@ -45,6 +45,7 @@
     display: inline-block; padding: 10px 18px; margin: 4px; border-radius: 8px; text-decoration: none;
     font-weight: 600; border: 1px solid var(--border);
   }
+  .btn .icon{display:inline-block;vertical-align:-0.15em;margin-right:.45em}
   .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
   .btn.ghost { color: var(--fg); background: transparent; }
   .lead { color: var(--fg); max-width: 820px; margin: 8px auto 0; text-align: center; }
@@ -82,8 +83,8 @@
     <p class="tagline">Pure-Go regular expressions with <strong>lookahead</strong>, <strong>lookbehind</strong> and <strong>backreferences</strong> — the constructs RE2 forbids.</p>
     <div class="pills"><span class="pill">CGO_ENABLED=0</span><span class="pill">lookahead / lookbehind</span><span class="pill">backreferences</span><span class="pill">atomic groups · \g&lt;call&gt;</span><span class="pill">stdlib-regexp-shaped API</span><span class="pill">macOS · Linux · Windows</span><span class="pill">BSD-3-Clause</span></div>
     <div class="cta">
-      <a class="btn primary" href="https://go-regexp.github.io/docs/">Documentation</a>
-      <a class="btn ghost" href="https://github.com/go-regexp">GitHub</a>
+      <a class="btn primary" href="https://go-regexp.github.io/docs/">{{ partial "icons/book.html" . }}Documentation</a>
+      <a class="btn ghost" href="https://github.com/go-regexp">{{ partial "icons/mark-github.html" . }}GitHub</a>
     </div>
   </header>
 
