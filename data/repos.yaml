@@ -1,2 +1,3 @@
 items:
   - { name: "engine", kind: "core", desc: "Pure-Go Onigmo-lineage regex engine; stdlib-<code>regexp</code>-shaped API with lookaround &amp; backrefs. CGO=0." }
+  - { name: "pcre2", kind: "port", desc: "Pure-Go port of PCRE2 10.44 (compile, match, pattern info), byte-for-byte against libpcre2. CGO=0." }
