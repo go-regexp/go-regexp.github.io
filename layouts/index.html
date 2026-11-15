@@ -41,12 +41,10 @@
   <div class="hero"><div class="wrap">
     <div>
       <h1 class="head">go-regexp</h1>
-      <p class="sub">Pure-Go regular expressions with <strong>lookahead</strong>, <strong>lookbehind</strong> and <strong>backreferences</strong> — the constructs RE2 forbids.</p>
-      <div class="cta">
-        <a class="btn btn-primary" href="https://go-regexp.github.io/docs/">{{ partial "icons/book.html" . }}Documentation</a>
-        <a class="btn btn-ghost" href="https://github.com/go-regexp">{{ partial "icons/github.html" . }}GitHub</a>
-      </div>
-      <div class="trust">{{ if not (partial "mantra-on.html" $) }}<span class="pill">CGO_ENABLED=0</span>{{ end }}<span class="pill">lookahead / lookbehind</span><span class="pill">backreferences</span><span class="pill">atomic groups · \g&lt;call&gt;</span><span class="pill">stdlib-regexp-shaped API</span><span class="pill">macOS · Linux · Windows</span>{{ if not (partial "mantra-on.html" $) }}<span class="pill">BSD-3-Clause</span>{{ end }}</div>
+      <p class="sub">{{ if partial "mantra-on.html" . }}Go{{ else }}Pure-Go{{ end }} regular expressions with <strong>lookahead</strong>, <strong>lookbehind</strong> and <strong>backreferences</strong> — the constructs RE2 forbids.</p>
+      {{/* [[params.cta]] in hugo.toml: the kit renders the row */}}
+      {{ partial "cta.html" . }}
+      <div class="trust">{{ if not (partial "mantra-on.html" $) }}{{ if not (partial "mantra-on.html" $) }}<span class="pill">CGO_ENABLED=0</span>{{ end }}{{ end }}<span class="pill">lookahead / lookbehind</span><span class="pill">backreferences</span><span class="pill">atomic groups · \g&lt;call&gt;</span><span class="pill">stdlib-regexp-shaped API</span><span class="pill">macOS · Linux · Windows</span>{{ if not (partial "mantra-on.html" $) }}{{ if not (partial "mantra-on.html" $) }}<span class="pill">BSD-3-Clause</span>{{ end }}{{ end }}</div>
     </div>
     {{ partial "hero-carousel.html" . }}
   </div></div>
